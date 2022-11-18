@@ -1,0 +1,54 @@
+    # Here some instructions:
+
+    
+    # First thing we need is to specify a new build
+    # We are gonna use the 'Dog' example because it's easy to explain
+
+    # You have to ever use 'this' for builds to specify a returning variable
+
+    # The 'def' statement is to define a new build's returnable variable
+    # The parameters of the def are [number, returning_to, "name", "value"]
+    #   1. 'Number': is the id (you should start with 1, 2, 3, 4, etc.)
+    #   2. 'Returning_to': has to ever be the 'this' variable
+    #   3. 'Name': the name of the variable to get globally
+    #   4. 'Value': the value of the variable (this will be returned)
+
+    # Here some examples |:
+    #                    v
+        def(1, this, "variable", 2)
+        def(2, this, "fruits", "strawberries, grapes")
+
+    
+    # Great!
+    # We created a build structure
+    # For get the data you can use variables or just the function
+        
+    # The using of the 'get' is just to use the function and in the and write
+    # parameter (AS A STRING) the name of the variable like:
+        get(Dog("variable"))
+
+    # And that's all about Sponky's builds
+    # I hope this could be useful for your learning!
+    # If you want to run the program and see the res
+    ult just execute this function like:
+        run(login + "/Desktop/Sponky/SP Languaje/examples/using_builds.sp")
+
+# This example is in examples/using_builds.sp:
+    build Dog(this)
+        def(1, this, "name", "Mr. Dogge")
+        def(2, this, "age", 9)
+        def(3, this, "favorite food", "chicken")
+        def(4, this, "color", "a brown dog")
+
+        return this
+    end
+
+    print("This is a dog!")
+
+    print("Favorite food: " + get(Dog("favorite food")))
+    var age = get(Dog("age"))
+    var color = get(Dog("color"))
+    var name = get(Dog("name"))
+
+    print("Name: " + name)
+    print("Age: " + age + " years")

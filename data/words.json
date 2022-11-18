@@ -1,0 +1,40 @@
+{
+    "Words": {
+        "KEYWORDS": [
+            "var",
+            "and",
+            "or",
+            "not",
+            "if",
+            "elif",
+            "else",
+            "for",
+            "to",
+            "step",
+            "while",
+            "func",
+            "then",
+            "end",
+            "return",
+            "continue",
+            "break",
+            "pass",
+            "build"
+        ]
+    },
+    "Classes": {
+        "Lexer": "class",
+        "Parser": "class",
+        "Number": "node",
+        "String": "node",
+        "List": "node",
+        "Func": "node",
+        "BuiltInFunction": [
+            "print",
+            "print_ret",
+            "input",
+            "input_int",
+            "cls"
+        ]
+    }
+}
