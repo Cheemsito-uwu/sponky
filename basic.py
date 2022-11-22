@@ -22,8 +22,8 @@ import random as rn
 #######################################
 
 DIGITS = '0123456789.'
-LETTERS = string.ascii_letters
-LETTERS_DIGITS = LETTERS + '_' + DIGITS
+LETTERS = string.ascii_letters + '{' + '}' + ':'
+LETTERS_DIGITS = LETTERS + DIGITS
 
 switching = True
 
@@ -148,8 +148,9 @@ KEYWORDS = [
   'step',
   'while',
   'func',
-  'then',
-  'end',
+  '{',
+  '}',
+  ':',
   'return',
   'continue',
   'switch',
@@ -930,7 +931,7 @@ class Parser:
         if res.error: return res
         else_case = (statements, True)
 
-        if self.current_tok.matches(TT_KEYWORD, 'end'):
+        if self.current_tok.matches(TT_KEYWORD, '}'):
           res.register_advancement()
           self.advance()
         else:
@@ -976,7 +977,7 @@ class Parser:
     condition = res.register(self.expr())
     if res.error: return res
 
-    if not self.current_tok.matches(TT_KEYWORD, 'then'):
+    if not self.current_tok.matches(TT_KEYWORD, '{') and not self.current_tok.type == TT_NEWLINE and not self.current_tok.matches(TT_KEYWORD, ':'):
       return res.failure(InvalidSyntaxError(
         self.current_tok.pos_start, self.current_tok.pos_end,
         f"Expected 'then'"
@@ -993,7 +994,7 @@ class Parser:
       if res.error: return res
       cases.append((condition, statements, True))
 
-      if self.current_tok.matches(TT_KEYWORD, 'end'):
+      if self.current_tok.matches(TT_KEYWORD, '}'):
         res.register_advancement()
         self.advance()
       else:
@@ -1068,7 +1069,7 @@ class Parser:
     else:
       step_value = None
 
-    if not self.current_tok.matches(TT_KEYWORD, 'then'):
+    if not self.current_tok.matches(TT_KEYWORD, '{'):
       return res.failure(InvalidSyntaxError(
         self.current_tok.pos_start, self.current_tok.pos_end,
         f"Expected 'then'"
@@ -1084,7 +1085,7 @@ class Parser:
       body = res.register(self.statements())
       if res.error: return res
 
-      if not self.current_tok.matches(TT_KEYWORD, 'end'):
+      if not self.current_tok.matches(TT_KEYWORD, '}'):
         return res.failure(InvalidSyntaxError(
           self.current_tok.pos_start, self.current_tok.pos_end,
           f"Expected 'end'"
@@ -1115,7 +1116,7 @@ class Parser:
     condition = res.register(self.expr())
     if res.error: return res
 
-    if not self.current_tok.matches(TT_KEYWORD, 'then'):
+    if not self.current_tok.matches(TT_KEYWORD, '{'):
       return res.failure(InvalidSyntaxError(
         self.current_tok.pos_start, self.current_tok.pos_end,
         f"Expected 'then'"
@@ -1131,7 +1132,7 @@ class Parser:
       body = res.register(self.statements())
       if res.error: return res
 
-      if not self.current_tok.matches(TT_KEYWORD, 'end'):
+      if not self.current_tok.matches(TT_KEYWORD, '}'):
         return res.failure(InvalidSyntaxError(
           self.current_tok.pos_start, self.current_tok.pos_end,
           f"Expected 'end'"
@@ -1228,11 +1229,11 @@ class Parser:
         True
       ))
     
-    if self.current_tok.matches(TT_KEYWORD, 'then'):
+    if self.current_tok.matches(TT_KEYWORD, '{'):
       pass
     
     if self.current_tok.type != TT_NEWLINE:
-      if self.current_tok.matches(TT_KEYWORD, 'then'):
+      if self.current_tok.matches(TT_KEYWORD, '{'):
         pass
       else:
         return res.failure(InvalidSyntaxError(
@@ -1246,7 +1247,7 @@ class Parser:
     body = res.register(self.statements())
     if res.error: return res
 
-    if not self.current_tok.matches(TT_KEYWORD, 'end'):
+    if not self.current_tok.matches(TT_KEYWORD, '}'):
       return res.failure(InvalidSyntaxError(
         self.current_tok.pos_start, self.current_tok.pos_end,
         f"Expected 'end'"
@@ -1346,11 +1347,11 @@ class Parser:
         True
       ))
     
-    if self.current_tok.matches(TT_KEYWORD, 'then'):
+    if self.current_tok.matches(TT_KEYWORD, '{'):
       pass
     
     if self.current_tok.type != TT_NEWLINE:
-      if self.current_tok.matches(TT_KEYWORD, 'then'):
+      if self.current_tok.matches(TT_KEYWORD, '{'):
         pass
       else:
         return res.failure(InvalidSyntaxError(
@@ -1364,7 +1365,7 @@ class Parser:
     body = res.register(self.statements())
     if res.error: return res
 
-    if not self.current_tok.matches(TT_KEYWORD, 'end'):
+    if not self.current_tok.matches(TT_KEYWORD, '}'):
       return res.failure(InvalidSyntaxError(
         self.current_tok.pos_start, self.current_tok.pos_end,
         f"Expected 'end'"
@@ -1461,11 +1462,11 @@ class Parser:
         True
       ))
     
-    if self.current_tok.matches(TT_KEYWORD, 'then'):
+    if self.current_tok.matches(TT_KEYWORD, '{'):
       pass
     
     if self.current_tok.type != TT_NEWLINE:
-      if self.current_tok.matches(TT_KEYWORD, 'then'):
+      if self.current_tok.matches(TT_KEYWORD, '{'):
         pass
       else:
         return res.failure(InvalidSyntaxError(
@@ -1479,7 +1480,7 @@ class Parser:
     body = res.register(self.statements())
     if res.error: return res
 
-    if not self.current_tok.matches(TT_KEYWORD, 'end'):
+    if not self.current_tok.matches(TT_KEYWORD, '}'):
       return res.failure(InvalidSyntaxError(
         self.current_tok.pos_start, self.current_tok.pos_end,
         f"Expected 'end'"
@@ -1798,6 +1799,7 @@ class String(Value):
 
 loguser = str("C:/Users/"+os.getlogin())
 String.loginuser = String(loguser)
+String._name_ = String("__main__")
 
 class List(Value):
   def __init__(self, elements):
@@ -2377,7 +2379,16 @@ class BuiltInFunction(BaseFunction):
   execute_get.arg_names = ["this"]
 
   def execute_ge2keys(self, exec_ctx):
-    pass
+    key = str(exec_ctx.symbol_table.get('key'))
+
+    #if keyboard.is_pressed(key):
+    #  return RTResult().success(
+    #    Number(1)
+    #  )
+    #else:
+    #  return RTResult().success(
+    #    Number(0)
+    #  )
   execute_ge2keys.arg_names = ["key"]
 
   def execute_strequal(self, exec_ctx):
@@ -2451,6 +2462,12 @@ class BuiltInFunction(BaseFunction):
       return RTResult().success(
         Number(thing)
       )
+    elif mode == "just color":
+      make_color = str(int_1)
+
+      return RTResult().success(
+        String(color.color_text(make_color))
+      )
     else:
       return RTResult().failure(
         RTError(
@@ -2520,42 +2537,44 @@ class BuiltInFunction(BaseFunction):
   execute_ad1wind.arg_names = ["type", "text", "id"]
 
   def execute_case(self, exec_ctx):
-
     case = exec_ctx.symbol_table.get('case')
     command = exec_ctx.symbol_table.get('command')
 
-    if case == String(case):
+    if case == String(case) and command == String(command):
       case = str(case)
+      command = str(command)
 
-      if command != String:
-        return RTResult().failure(
-          RTError(
-            self.pos_start, self.pos_end,
-            f"The case command must be a string"
-          )
-        )
-      else:
-        command = str(command)
-
-        if command == case: return RTResult().success(Number(1))
-        else: return RTResult().success(Number(0))
+      if case == command:
+        return RTResult().success(Number(1))
       
-    elif case == Number(case):
+      if case != command:
+        return RTResult().success(Number(0))
+    elif case == Number(case) and command == Number(command):
       case = int(case)
-      
-      if command != Number:
-        return RTResult().failure(
-          RTError(
-            self.pos_start, self.pos_end,
-            f"The case command must be a number"
-          )
-        )
-      else:
-        command = int(command)
+      command = int(command)
 
-        if command == case: return RTResult().success(Number(1))
-        else: return RTResult().success(Number(0))
+      if case == command:
+        return RTResult().success(Number(1))
+      
+      if case != command:
+        return RTResult().success(Number(0))
+    
   execute_case.arg_names = ["command", "case"]
+
+  def execute_ex1daffl(self, exec_ctx):
+    filename = str(exec_ctx.symbol_table.get('filename'))
+
+    if os.path.exists(filename):
+      return RTResult().success(Number(1))
+    else:
+      return RTResult().success(Number(0))
+  execute_ex1daffl.arg_names = ["filename"]
+
+  def execute_make(self, exec_ctx):
+    filename = str(exec_ctx.symbol_table.get('filename'))
+
+    os.system()
+  execute_make.arg_names = ["filename"]
 
 
 
@@ -2590,6 +2609,7 @@ BuiltInFunction.wf1daffl = BuiltInFunction("wf1daffl")
 BuiltInFunction.rf1daffl = BuiltInFunction("rf1daffl")
 BuiltInFunction.df1daffl = BuiltInFunction("df1daffl")
 BuiltInFunction.rnf1dffl = BuiltInFunction("rnf1dffl")
+BuiltInFunction.ex1daffl = BuiltInFunction("ex1daffl")
 BuiltInFunction.wn1wind = BuiltInFunction("wn1wind")
 BuiltInFunction.ad1wind = BuiltInFunction("ad1wind")
 BuiltInFunction.po1wind = BuiltInFunction("po1wind")
@@ -2891,10 +2911,13 @@ class Interpreter:
 
 global_symbol_table = SymbolTable()
 global_symbol_table.set("null", Number.null)
+global_symbol_table.set("pass", Number.null)
 global_symbol_table.set("false", Number.false)
 global_symbol_table.set("true", Number.true)
 global_symbol_table.set("math_pi", Number.math_PI)
 global_symbol_table.set("login", String.loginuser)
+global_symbol_table.set("sp.name", String._name_)
+global_symbol_table.set("sp.main", String._name_)
 global_symbol_table.set("print", BuiltInFunction.print)
 global_symbol_table.set("print_ret", BuiltInFunction.print_ret)
 global_symbol_table.set("input", BuiltInFunction.input)
@@ -2909,7 +2932,6 @@ global_symbol_table.set("append", BuiltInFunction.append)
 global_symbol_table.set("pop", BuiltInFunction.pop)
 global_symbol_table.set("extend", BuiltInFunction.extend)
 global_symbol_table.set("rand", BuiltInFunction.rand)
-global_symbol_table.set("pass", BuiltInFunction.pass_)
 global_symbol_table.set("len", BuiltInFunction.len)
 global_symbol_table.set("run", BuiltInFunction.run)
 global_symbol_table.set("use", BuiltInFunction.use)
@@ -2925,6 +2947,7 @@ global_symbol_table.set("wf1daffl", BuiltInFunction.wf1daffl)
 global_symbol_table.set("rf1daffl", BuiltInFunction.rf1daffl)
 global_symbol_table.set("df1daffl", BuiltInFunction.df1daffl)
 global_symbol_table.set("rnf1dffl", BuiltInFunction.rnf1dffl)
+global_symbol_table.set("ex1daffl", BuiltInFunction.ex1daffl)
 global_symbol_table.set("wn1wind", BuiltInFunction.wn1wind)
 global_symbol_table.set("ad1wind", BuiltInFunction.ad1wind)
 global_symbol_table.set("po1wind", BuiltInFunction.po1wind)
@@ -2986,3 +3009,29 @@ def run(fn, text):
   result = interpreter.visit(ast.node, context)
 
   return result.value, result.error
+
+def run_program(filename):
+  fn = filename
+  pos_start = 0
+  pos_end = 0
+
+  try:
+    with open(fn, "r") as f:
+      script = f.read()
+  except Exception as e:
+    return RTResult().failure(RTError(
+      pos_start, pos_end,
+      f"Failed to load script \"{fn}\"\n" + str(e)
+    ))
+
+  _, error = run(fn, script)
+    
+  if error:
+    return RTResult().failure(RTError(
+      pos_start, pos_end,
+      f"Failed to finish executing script \"{fn}\"\n" +
+      error.as_string(),
+      None
+    ))
+
+  return RTResult().success(Number.null)

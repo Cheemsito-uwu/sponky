@@ -1,5 +1,6 @@
 run(console)
 run(sys)
+run(init)
 
 func game()
     var game_over = false;
@@ -11,15 +12,13 @@ func game()
         gotoxy(x, y)
         print("*")
 
-        var key = input()
-
-        if strequal(key, "a") == true then
+        if game.is_pressed("a") then
             var x = x - 1
-        elif strequal(key, "d") == true then 
+        elif game.is_pressed("d") then 
             var x = x + 1
-        elif strequal(key, "s") == true then
+        elif game.is_pressed("s") then
             var y = y + 1
-        elif strequal(key, "w") == true then 
+        elif game.is_pressed("w") then 
             var y = y - 1
         else
             null

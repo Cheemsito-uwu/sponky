@@ -1,28 +1,45 @@
 from data.pyinclude import colors
 from data.pyinclude import temp
+from data import config
+
+import colorama
+from colorama import Fore, Style
 import basic
+import os
 
 def interpreter():
 	while True:
-		text = input(colors.color_text('[[blue]]sponky > '))
+		colorama.init(autoreset=True)
+
+		text = input(Fore.BLUE + 'sponky > ' + Fore.CYAN)
 		if text.strip() == "": continue
-		print(colors.color_text("[[blue]]"))
+		print(Fore.WHITE)
 		result, error = basic.run('<stdin>', text)
 	
 		if error:
-			if str(text) == "exit":
-				break
-				return
-			print(colors.color_text("[[red]]ERROR"))
-			print(error.as_string())
+			match str(text):
+				case "config":
+					config.opn()
+					continue
+
+				case "exit" | "quit":
+					break
+				
+				case _:
+					if os.path.exists(str(text)):
+						basic.run_program(str(text))
+						continue
+
+
+			print(Fore.RED + error.as_string())
 		elif result:
 			if len(result.elements) == 1:
 				temp.delete()
-				print(colors.color_text("[[green]]---------------------------"))
-				print(colors.color_text("[[green]] Code ended with value: "+repr(result.elements[0])))
-				print(colors.color_text("[[green]]---------------------------"))
+				print(Fore.GREEN + "---------------------------")
+				print(Fore.GREEN + " Code ended with value: "+repr(result.elements[0]))
+				print(Fore.GREEN + "---------------------------")
 			else:
-				print(colors.color_text("[[white]]") + repr(result))
+				print(Fore.GREEN + repr(result))
 
 if __name__ == "__main__":
 	interpreter()

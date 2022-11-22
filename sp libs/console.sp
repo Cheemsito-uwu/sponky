@@ -6,12 +6,11 @@ func ExpectedCharError(details) -> er3inte("ExpectedCharError", details)
 func InvalidSyntaxError(detail) -> er3inte("InvalidSyntaxError", detail)
 
 func printbool(value)
-    if value == true then
+    if value == true {
         print("true")
-    elif value == false then
+    elif value == false {
         print("false")
-    elif value == null then
+    elif value == null {
         print("null")
-    end
-end
-
+    }
+}
